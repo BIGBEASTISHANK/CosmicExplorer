@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import { ArrowRight } from 'lucide-react';
 import type { VantaGlobe } from '@/types/vanta';
+import Script from 'next/script';
 
 // Define the VANTA object on the window
 declare global {
@@ -19,9 +20,10 @@ declare global {
 export default function Home() {
   const vantaRef = useRef(null);
   const [vantaEffect, setVantaEffect] = useState<any>(null);
+  const [scriptsLoaded, setScriptsLoaded] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && window.VANTA && !vantaEffect) {
+    if (scriptsLoaded && !vantaEffect) {
       setVantaEffect(window.VANTA.GLOBE({
         el: vantaRef.current,
         mouseControls: true,
@@ -42,28 +44,35 @@ export default function Home() {
         vantaEffect.destroy();
       }
     };
-  }, [vantaEffect]);
+  }, [scriptsLoaded, vantaEffect]);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-1">
-        <section ref={vantaRef} className="relative w-full h-[calc(100vh-3.5rem)] flex items-center justify-center">
-          <div className="relative z-10 text-center px-4">
-            <h1 className="text-4xl md:text-6xl font-bold font-headline tracking-tighter mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
-              Cosmic Explorer
-            </h1>
-            <p className="max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground mb-8">
-              Your portal to the universe. Explore real-time data from NASA, from the surface of Mars to the vastness of near-Earth space.
-            </p>
-            <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
-              <Link href="/dashboard">
-                Launch Dashboard <ArrowRight className="ml-2" />
-              </Link>
-            </Button>
-          </div>
-        </section>
-      </main>
-    </div>
+    <>
+      <Script 
+        src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"
+        onLoad={() => setScriptsLoaded(true)}
+      />
+      <Script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js" />
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <main className="flex-1">
+          <section ref={vantaRef} className="relative w-full h-[calc(100vh-3.5rem)] flex items-center justify-center">
+            <div className="relative z-10 text-center px-4">
+              <h1 className="text-4xl md:text-6xl font-bold font-headline tracking-tighter mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
+                Cosmic Explorer
+              </h1>
+              <p className="max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground mb-8">
+                Your portal to the universe. Explore real-time data from NASA, from the surface of Mars to the vastness of near-Earth space.
+              </p>
+              <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                <Link href="/dashboard">
+                  Launch Dashboard <ArrowRight className="ml-2" />
+                </Link>
+              </Button>
+            </div>
+          </section>
+        </main>
+      </div>
+    </>
   );
 }

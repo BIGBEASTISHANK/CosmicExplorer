@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
-import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'Cosmic Explorer',
@@ -23,8 +22,6 @@ export default function RootLayout({
       <body className="font-body bg-background text-foreground antialiased">
         {children}
         <Toaster />
-        <Script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></Script>
-        <Script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></Script>
       </body>
     </html>
   );
