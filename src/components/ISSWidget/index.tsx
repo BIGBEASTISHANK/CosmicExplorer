@@ -7,8 +7,7 @@ import { Users, Satellite, Loader, Orbit, ChevronsUp, Eye, X, Rocket } from 'luc
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
-
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 type ISSData = {
     latitude: number;
@@ -36,7 +35,6 @@ const ISSWidget = () => {
 
     useEffect(() => {
         const fetchISSData = async () => {
-            setLoading(true);
             try {
                 const response = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
                 if (!response.ok) {
@@ -79,12 +77,8 @@ const ISSWidget = () => {
                             </Button>
                         </DialogTrigger>
                         <DialogContent className="w-screen h-screen max-w-full max-h-full flex flex-col p-0 m-0">
-                            <DialogHeader className="p-2 border-b bg-background flex-row items-center justify-between">
+                            <DialogHeader className="p-4 border-b bg-background">
                                 <DialogTitle>International Space Station - 3D Model</DialogTitle>
-                                <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-                                    <X className="h-6 w-6" />
-                                    <span className="sr-only">Close</span>
-                                </DialogClose>
                             </DialogHeader>
                             <div className="flex-grow w-full h-full">
                                 <iframe
