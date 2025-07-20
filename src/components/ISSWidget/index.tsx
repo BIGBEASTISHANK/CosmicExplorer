@@ -33,7 +33,6 @@ const ISSWidget = () => {
     useEffect(() => {
         const fetchISSData = async () => {
             try {
-                // Only show the main loader on initial fetch
                 if (!issData) {
                     setLoading(true);
                 }
@@ -56,14 +55,15 @@ const ISSWidget = () => {
         };
 
         fetchISSData();
-        const interval = setInterval(fetchISSData, 2000); 
+        const interval = setInterval(fetchISSData, 2000);
 
         return () => clearInterval(interval);
-    }, [issData]);
+    }, []); // Fixed: Empty dependency array
 
+    // Fixed: Added marker parameter
     const mapUrl = issData
-      ? `https://staticmap.openstreetmap.de/staticmap.php?center=${issData.latitude},${issData.longitude}&zoom=2&size=400x200&maptype=mapnik`
-      : null;
+        ? `https://staticmap.openstreetmap.de/staticmap.php?center=${issData.latitude},${issData.longitude}&zoom=2&size=400x200&maptype=mapnik&markers=${issData.latitude},${issData.longitude},red-pushpin`
+        : null;
 
     return (
         <Card className="h-full flex flex-col">
@@ -75,26 +75,26 @@ const ISSWidget = () => {
                 <CardDescription>Real-time telemetry & crew</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col flex-grow">
-                 {loading ? (
+                {loading ? (
                     <div className="flex items-center justify-center h-full">
                         <Loader className="w-8 h-8 animate-spin" />
                         <span className="sr-only">Loading ISS data...</span>
                     </div>
                 ) : error ? (
-                     <div className="flex items-center justify-center h-full text-destructive p-4 text-center">
+                    <div className="flex items-center justify-center h-full text-destructive p-4 text-center">
                         {error}
                     </div>
                 ) : issData && mapUrl ? (
                     <>
                         <div className="relative aspect-video rounded-md overflow-hidden bg-muted mb-4">
-                           <Image 
-                               key={mapUrl}
-                               src={mapUrl} 
-                               alt={`Map of ISS location at ${issData?.latitude.toFixed(2)}, ${issData?.longitude.toFixed(2)}`}
-                               fill 
-                               className="object-cover" 
-                               unoptimized
-                           />
+                            <Image 
+                                key={mapUrl}
+                                src={mapUrl} 
+                                alt={`Map of ISS location at ${issData?.latitude.toFixed(2)}, ${issData?.longitude.toFixed(2)}`}
+                                fill 
+                                className="object-cover" 
+                                unoptimized
+                            />
                             <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded-md text-xs">
                                 Lat: {issData.latitude.toFixed(2)}, Lon: {issData.longitude.toFixed(2)}
                             </div>
@@ -105,7 +105,7 @@ const ISSWidget = () => {
                                 <ChevronsUp className="w-4 h-4 text-muted-foreground" />
                                 <span>Altitude: {issData.altitude.toFixed(2)} km</span>
                             </div>
-                             <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2">
                                 <Orbit className="w-4 h-4 text-muted-foreground" />
                                 <span>Velocity: {issData.velocity.toFixed(2)} km/h</span>
                             </div>
@@ -118,7 +118,9 @@ const ISSWidget = () => {
                         <Separator className="my-4" />
 
                         <div className="space-y-3 flex-grow">
-                            <h4 className="text-sm font-medium flex items-center gap-2"><Users className="w-4 h-4" /> Current Crew ({crew.length})</h4>
+                            <h4 className="text-sm font-medium flex items-center gap-2">
+                                <Users className="w-4 h-4" /> Current Crew ({crew.length})
+                            </h4>
                             <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                                 {crew.map(member => (
                                     <div key={member.name} className="flex items-center gap-2">
