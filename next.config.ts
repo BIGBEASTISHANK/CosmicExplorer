@@ -1,7 +1,6 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -25,6 +24,25 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'staticmap.openstreetmap.de',
+        port: '',
+        pathname: '/**',
+      },
+      // Add these for Live Earth View
+      {
+        protocol: 'https',
+        hostname: 'epic.gsfc.nasa.gov',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.star.nesdis.noaa.gov',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'eoimages.gsfc.nasa.gov',
         port: '',
         pathname: '/**',
       }
