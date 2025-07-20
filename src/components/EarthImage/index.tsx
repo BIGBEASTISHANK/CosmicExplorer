@@ -104,10 +104,10 @@ const EarthImage = () => {
                 ) : (
                     <>
                         <div 
-                            className="relative w-[450px] h-[450px] rounded-full overflow-hidden border-4 border-blue-400/30 shadow-2xl"
+                            className="relative w-[500px] h-[500px] rounded-full overflow-hidden border-4 border-blue-400/30 shadow-2xl"
                             style={{
                                 animation: 'earthRotate 45s linear infinite',
-                                boxShadow: '0 0 60px rgba(59, 130, 246, 0.4), inset 0 0 60px rgba(0, 0, 0, 0.5)',
+                                boxShadow: '0 0 80px rgba(59, 130, 246, 0.5), inset 0 0 60px rgba(0, 0, 0, 0.6)',
                             }}
                         >
                             {earthImageUrl && (
