@@ -8,12 +8,13 @@ const ISSWidget = () => {
     const issData = {
         location: { lat: '51.5 N', lon: '0.1 W' },
         crew: [
-            { name: 'Oleg Kononenko', role: 'Commander', avatar: 'OK' },
+            { name: 'Oleg Kononenko', role: 'Commander, Expedition 71', avatar: 'OK' },
             { name: 'Nikolai Chub', role: 'Flight Engineer', avatar: 'NC' },
             { name: 'Tracy C. Dyson', role: 'Flight Engineer', avatar: 'TD' },
             { name: 'Matthew Dominick', role: 'Flight Engineer', avatar: 'MD' },
-            { name: 'Michael Barratt', role: 'Flight Engineer', avatar: 'MB' },
+            { name: 'Mike Barratt', role: 'Flight Engineer', avatar: 'MB' },
             { name: 'Jeanette Epps', role: 'Flight Engineer', avatar: 'JE' },
+            { name: 'Alexander Grebenkin', role: 'Flight Engineer', avatar: 'AG' },
         ]
     };
 
