@@ -19,7 +19,7 @@ const ISSWidget = () => {
     const [issData, setIssData] = useState<ISSData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
+    
     const crew = [
         { name: 'Oleg Kononenko', role: 'Commander, Expedition 71', avatar: 'OK' },
         { name: 'Nikolai Chub', role: 'Flight Engineer', avatar: 'NC' },
@@ -33,6 +33,7 @@ const ISSWidget = () => {
     useEffect(() => {
         const fetchISSData = async () => {
             try {
+                setLoading(prev => !issData ? true : false); // only show big loader on first load
                 const response = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
                 if (!response.ok) {
                     throw new Error('Failed to fetch ISS data');
@@ -54,13 +55,13 @@ const ISSWidget = () => {
         fetchISSData();
         const interval = setInterval(fetchISSData, 2000); 
 
-        return () => {
-            clearInterval(interval);
-        };
-    }, []);
+        return () => clearInterval(interval);
+    }, [issData]);
 
-    const mapUrl = issData
-      ? `https://staticmap.openstreetmap.de/staticmap.php?center=${issData.latitude},${issData.longitude}&zoom=2&size=400x200&maptype=mapnik&markers=${issData.latitude},${issData.longitude},red-pushpin`
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    
+    const mapUrl = issData && apiKey
+      ? `https://maps.googleapis.com/maps/api/staticmap?center=${issData.latitude},${issData.longitude}&zoom=2&size=400x200&maptype=satellite&markers=color:red%7C${issData.latitude},${issData.longitude}&key=${apiKey}`
       : null;
 
     return (
@@ -134,7 +135,7 @@ const ISSWidget = () => {
                     </>
                 ) : (
                     <div className="flex items-center justify-center h-full text-muted-foreground p-4 text-center">
-                        Could not load map data.
+                        Could not load map data. Make sure the Google Maps API key is set.
                     </div>
                 )}
             </CardContent>
