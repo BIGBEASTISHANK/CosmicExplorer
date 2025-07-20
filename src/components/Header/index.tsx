@@ -1,6 +1,5 @@
-import { Rocket, Moon } from 'lucide-react';
+import { Rocket } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 
 const Header = () => {
   return (
@@ -10,12 +9,6 @@ const Header = () => {
           <Rocket className="h-6 w-6 text-primary" />
           <span className="font-bold font-headline text-lg">Cosmic Explorer</span>
         </Link>
-        <div className="flex flex-1 items-center justify-end space-x-2">
-          <Button variant="ghost" size="icon" aria-label="Toggle theme">
-            <Moon className="h-5 w-5" />
-            <span className="sr-only">Toggle theme</span>
-          </Button>
-        </div>
       </div>
     </header>
   );
