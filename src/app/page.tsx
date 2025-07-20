@@ -1,22 +1,54 @@
-import Image from 'next/image';
+"use client";
+
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import { ArrowRight } from 'lucide-react';
+import type { VantaGlobe } from '@/types/vanta';
+
+// Define the VANTA object on the window
+declare global {
+  interface Window {
+    VANTA: {
+      GLOBE: (options: VantaGlobe) => any;
+    };
+  }
+}
 
 export default function Home() {
+  const vantaRef = useRef(null);
+  const [vantaEffect, setVantaEffect] = useState<any>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.VANTA && !vantaEffect) {
+      setVantaEffect(window.VANTA.GLOBE({
+        el: vantaRef.current,
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.00,
+        minWidth: 200.00,
+        scale: 1.00,
+        scaleMobile: 1.00,
+        backgroundColor: 0x0,
+        color: 0x2169b6,
+        size: 1.2,
+      }));
+    }
+
+    return () => {
+      if (vantaEffect) {
+        vantaEffect.destroy();
+      }
+    };
+  }, [vantaEffect]);
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1">
-        <section className="relative w-full h-[calc(100vh-3.5rem)] flex items-center justify-center">
-          <Image
-            src="https://placehold.co/1920x1080"
-            alt="Cosmic background"
-            fill
-            className="absolute inset-0 z-0 object-cover opacity-30"
-            data-ai-hint="galaxy stars"
-          />
+        <section ref={vantaRef} className="relative w-full h-[calc(100vh-3.5rem)] flex items-center justify-center">
           <div className="relative z-10 text-center px-4">
             <h1 className="text-4xl md:text-6xl font-bold font-headline tracking-tighter mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
               Cosmic Explorer
