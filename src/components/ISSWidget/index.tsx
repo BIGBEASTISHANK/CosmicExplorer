@@ -3,9 +3,12 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Satellite, Loader, Orbit, ChevronsUp, Eye } from 'lucide-react';
+import { Users, Satellite, Loader, Orbit, ChevronsUp, Eye, X, Rocket } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
+
 
 type ISSData = {
     latitude: number;
@@ -33,6 +36,7 @@ const ISSWidget = () => {
 
     useEffect(() => {
         const fetchISSData = async () => {
+            setLoading(true);
             try {
                 const response = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
                 if (!response.ok) {
@@ -62,9 +66,39 @@ const ISSWidget = () => {
     return (
         <Card className="h-full flex flex-col">
             <CardHeader>
-                <div className="flex items-center gap-2">
-                    <Satellite className="w-6 h-6 text-accent" />
-                    <CardTitle className="font-headline">ISS Tracker</CardTitle>
+                <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                        <Satellite className="w-6 h-6 text-accent" />
+                        <CardTitle className="font-headline">ISS Tracker</CardTitle>
+                    </div>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                                <Rocket />
+                                View 3D Model
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="w-screen h-screen max-w-full max-h-full flex flex-col p-0 m-0">
+                            <DialogHeader className="p-2 border-b bg-background flex-row items-center justify-between">
+                                <DialogTitle>International Space Station - 3D Model</DialogTitle>
+                                <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                                    <X className="h-6 w-6" />
+                                    <span className="sr-only">Close</span>
+                                </DialogClose>
+                            </DialogHeader>
+                            <div className="flex-grow w-full h-full">
+                                <iframe
+                                    src="https://solarsystem.nasa.gov/gltf_embed/2378/"
+                                    width="100%"
+                                    height="100%"
+                                    frameBorder="0"
+                                    allowFullScreen
+                                    className="w-full h-full"
+                                    title="NASA 3D ISS Model"
+                                />
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                 </div>
                 <CardDescription>Real-time telemetry & crew</CardDescription>
             </CardHeader>
@@ -74,19 +108,21 @@ const ISSWidget = () => {
                         <Loader className="w-8 h-8 animate-spin text-muted-foreground" />
                     ) : error ? (
                         <div className="text-destructive p-4 text-center text-sm">{error}</div>
-                    ) : mapUrl && issData ? (
+                    ) : mapUrl ? (
                         <>
                             <Image 
                                 key={mapUrl}
                                 src={mapUrl} 
-                                alt={`Map of ISS location at ${issData.latitude.toFixed(2)}, ${issData.longitude.toFixed(2)}`}
+                                alt={`Map of ISS location`}
                                 fill 
                                 className="object-cover" 
                                 unoptimized
                             />
-                            <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded-md text-xs">
-                                Lat: {issData.latitude.toFixed(2)}, Lon: {issData.longitude.toFixed(2)}
-                            </div>
+                            {issData && (
+                                <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded-md text-xs">
+                                    Lat: {issData.latitude.toFixed(2)}, Lon: {issData.longitude.toFixed(2)}
+                                </div>
+                            )}
                         </>
                     ) : (
                         <div className="text-muted-foreground p-4 text-center text-sm">Could not load map data.</div>

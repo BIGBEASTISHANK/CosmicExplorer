@@ -16,13 +16,14 @@ type Asteroid = {
 };
 
 const allAsteroids: Asteroid[] = [
+    { name: '(2025 AB1)', date: '2025-07-30', diameter: '210 m', hazardous: true },
+    { name: '(2025 XY9)', date: '2025-08-05', diameter: '1.1 km', hazardous: true },
+    { name: '(2025 QZ7)', date: '2025-08-15', diameter: '65 m', hazardous: false },
     { name: '(2024 MK)', date: '2024-06-29', diameter: '187 m', hazardous: true },
-    { name: '(2011 UL21)', date: '2024-06-27', diameter: '2.3 km', hazardous: true },
-    { name: '415029 (2011 UL21)', date: '2024-08-14', diameter: '30 m', hazardous: false },
-    { name: '(2023 FZ3)', date: '2024-09-01', diameter: '89 m', hazardous: false },
     { name: '99942 Apophis', date: '2029-04-13', diameter: '370 m', hazardous: true },
     { name: '(2007 FT3)', date: '2024-10-05', diameter: '340 m', hazardous: false },
 ];
+
 
 const AsteroidTracker = () => {
     const [showHazardousOnly, setShowHazardousOnly] = useState(false);
