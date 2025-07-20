@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -6,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Globe, Satellite, Clock, Loader, AlertTriangle } from 'lucide-react';
 
 // API endpoint for recent image metadata
-const EPIC_API_URL = 'https://epic.gsfc.nasa.gov/api/natural';
+const EPIC_API_URL = 'https://epic.gsfc.nasa.gov/api/natural/available';
 
 const EarthImage = () => {
     const [currentDate, setCurrentDate] = useState('');
@@ -29,18 +30,27 @@ const EarthImage = () => {
             setIsLoading(true);
             setImageError(null);
             try {
-                const response = await fetch(EPIC_API_URL);
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch EPIC metadata (status: ${response.status})`);
+                const availableDatesResponse = await fetch(EPIC_API_URL);
+                if (!availableDatesResponse.ok) {
+                    throw new Error(`Failed to fetch available dates (status: ${availableDatesResponse.status})`);
                 }
-                const data = await response.json();
+                const availableDates = await availableDatesResponse.json();
+                if (!availableDates || availableDates.length === 0) {
+                    throw new Error('No available dates for EPIC images found.');
+                }
+                const mostRecentDate = availableDates[availableDates.length - 1]; // YYYY-MM-DD format
                 
-                if (data && data.length > 0) {
-                    const latestImage = data[0];
-                    const date = new Date(latestImage.date);
-                    const year = date.getFullYear();
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const day = String(date.getDate()).padStart(2, '0');
+                const [year, month, day] = mostRecentDate.split('-');
+
+                // Fetch all images for that most recent date
+                const imageListResponse = await fetch(`https://epic.gsfc.nasa.gov/api/natural/date/${mostRecentDate}`);
+                if (!imageListResponse.ok) {
+                    throw new Error(`Failed to fetch image list for ${mostRecentDate} (status: ${imageListResponse.status})`);
+                }
+                const imageList = await imageListResponse.json();
+
+                if (imageList && imageList.length > 0) {
+                    const latestImage = imageList[imageList.length - 1];
                     const imageName = latestImage.image;
                     
                     const imageUrl = `https://epic.gsfc.nasa.gov/archive/natural/${year}/${month}/${day}/png/${imageName}.png`;
@@ -55,7 +65,6 @@ const EarthImage = () => {
                 } else {
                     setImageError("An unknown error occurred.");
                 }
-                // Use a reliable fallback if the API fails
                 setEarthImageUrl('https://eoimages.gsfc.nasa.gov/images/imagerecords/73000/73909/world.topo.bathy.200407.3x5400x2700.jpg');
             } finally {
                 setIsLoading(false);
@@ -72,6 +81,7 @@ const EarthImage = () => {
     const handleImageError = () => {
         console.error('Final image load failed, displaying error message.');
         setImageError("The Earth image could not be loaded.");
+        setEarthImageUrl(''); // Clear the broken URL
     };
 
     return (
@@ -80,7 +90,7 @@ const EarthImage = () => {
                 <Globe className="w-6 h-6 text-accent" />
                 <CardTitle className="font-headline">Live Earth View</CardTitle>
             </CardHeader>
-            <CardContent className="flex-grow relative rounded-md overflow-hidden bg-black flex items-center justify-center">
+            <CardContent className="flex-grow relative rounded-md overflow-hidden bg-black flex items-center justify-center p-0">
                 {isLoading ? (
                     <div className="flex flex-col items-center gap-4">
                         <Loader className="w-8 h-8 animate-spin text-accent" />
@@ -94,12 +104,10 @@ const EarthImage = () => {
                 ) : (
                     <>
                         <div 
-                            className="relative rounded-full overflow-hidden border-4 border-blue-400/30 shadow-2xl"
+                            className="relative w-[450px] h-[450px] rounded-full overflow-hidden border-4 border-blue-400/30 shadow-2xl"
                             style={{
-                                width: '300px',
-                                height: '300px',
-                                animation: 'earthRotate 25s linear infinite',
-                                boxShadow: '0 0 40px rgba(59, 130, 246, 0.4), inset 0 0 40px rgba(0, 0, 0, 0.5)',
+                                animation: 'earthRotate 45s linear infinite',
+                                boxShadow: '0 0 60px rgba(59, 130, 246, 0.4), inset 0 0 60px rgba(0, 0, 0, 0.5)',
                             }}
                         >
                             {earthImageUrl && (
@@ -107,9 +115,8 @@ const EarthImage = () => {
                                     key={earthImageUrl} // Force re-render on URL change
                                     src={earthImageUrl}
                                     alt="Live view of Earth from space"
-                                    width={300}
-                                    height={300}
-                                    className="object-cover w-full h-full"
+                                    layout="fill"
+                                    className="object-cover"
                                     unoptimized
                                     priority // Prioritize loading this image
                                     onError={handleImageError}
@@ -117,7 +124,7 @@ const EarthImage = () => {
                             )}
                         </div>
                         
-                        <div className="absolute top-4 right-4">
+                        <div className="absolute top-4 right-4 z-10">
                             <div className="flex items-center gap-2 bg-black/70 text-white px-3 py-2 rounded-lg">
                                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                                 <Satellite className="w-4 h-4" />
@@ -125,7 +132,7 @@ const EarthImage = () => {
                             </div>
                         </div>
 
-                        <div className="absolute bottom-4 left-4 space-y-2">
+                        <div className="absolute bottom-4 left-4 z-10 space-y-2">
                             <div className="bg-black/70 text-white px-3 py-2 rounded-lg text-sm flex items-center gap-2">
                                 <Clock className="w-4 h-4" />
                                 {currentDate}
