@@ -1,5 +1,7 @@
 # 🌌 Cosmic Explorer
 
+![Banner](.)
+
 **A Real-Time Space Mission Dashboard**  
 Designed and built for **Nebula Nexus** by Club Cosmos
 
@@ -92,7 +94,7 @@ Designed and built for **Nebula Nexus** by Club Cosmos
   - Mars Weather: Latest weather, atmospheric trends, rover images.
   - Asteroid Tracker: Table and visual alerts for upcoming asteroid approaches.
   - Satellite Imagery: Earth high-resolution live and archival views.
-  - Satalite Telementry: View Operational stalites info.
+  - Satellite Telemetry: View Operational satellites info.
 
 - **Auto-refresh**: Real-time data modules update automatically.
 - **Responsive UI**: Works on desktop and mobile.
@@ -107,7 +109,7 @@ Designed and built for **Nebula Nexus** by Club Cosmos
 | Mars Weather      | [NASA Insight API](https://api.nasa.gov/)         |
 | Asteroid Data     | [Asteroids NeoWs](https://api.nasa.gov/)          |
 | Satellite Imagery | [GIBS imagery](https://api.nasa.gov/)             |
-
+| MapTiler          | [MapTiler](https://www.maptiler.com/)             |
 ---
 
 ## Contributing
@@ -121,7 +123,7 @@ Designed and built for **Nebula Nexus** by Club Cosmos
 ## 👥 Credits
 Special thanks to the amazing team behind COSMIC EXPLORER:
  
-👨‍💻 [HB Singh Chaudhary](https://github.com/M4YH3M-DEV/) 
+👨‍💻 [HB Singh Chaudhary (M4YH3M-DEV)](https://github.com/M4YH3M-DEV/) 
  
 👨‍💻 [BIGBEASTISHANK (Pranjal)](https://bigbeastishank.com/) 
 
