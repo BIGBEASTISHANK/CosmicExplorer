@@ -17,6 +17,7 @@ type ISSData = {
 
 const ISSWidget = () => {
     const [issData, setIssData] = useState<ISSData | null>(null);
+    const [mapUrl, setMapUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     
@@ -33,15 +34,13 @@ const ISSWidget = () => {
     useEffect(() => {
         const fetchISSData = async () => {
             try {
-                if (!issData) {
-                    setLoading(true);
-                }
                 const response = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
                 if (!response.ok) {
                     throw new Error('Failed to fetch ISS data');
                 }
                 const data: ISSData = await response.json();
                 setIssData(data);
+                setMapUrl(`https://staticmap.openstreetmap.de/staticmap.php?center=${data.latitude},${data.longitude}&zoom=2&size=400x200&maptype=mapnik&markers=${data.latitude},${data.longitude},red-pushpin`);
                 setError(null);
             } catch (err) {
                 if (err instanceof Error) {
@@ -58,12 +57,7 @@ const ISSWidget = () => {
         const interval = setInterval(fetchISSData, 2000);
 
         return () => clearInterval(interval);
-    }, []); // Fixed: Empty dependency array
-
-    // Fixed: Added marker parameter
-    const mapUrl = issData
-        ? `https://staticmap.openstreetmap.de/staticmap.php?center=${issData.latitude},${issData.longitude}&zoom=2&size=400x200&maptype=mapnik&markers=${issData.latitude},${issData.longitude},red-pushpin`
-        : null;
+    }, []);
 
     return (
         <Card className="h-full flex flex-col">
@@ -75,22 +69,17 @@ const ISSWidget = () => {
                 <CardDescription>Real-time telemetry & crew</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col flex-grow">
-                {loading ? (
-                    <div className="flex items-center justify-center h-full">
-                        <Loader className="w-8 h-8 animate-spin" />
-                        <span className="sr-only">Loading ISS data...</span>
-                    </div>
-                ) : error ? (
-                    <div className="flex items-center justify-center h-full text-destructive p-4 text-center">
-                        {error}
-                    </div>
-                ) : issData && mapUrl ? (
-                    <>
-                        <div className="relative aspect-video rounded-md overflow-hidden bg-muted mb-4">
+                <div className="relative aspect-video rounded-md overflow-hidden bg-muted mb-4 flex items-center justify-center">
+                    {loading ? (
+                        <Loader className="w-8 h-8 animate-spin text-muted-foreground" />
+                    ) : error ? (
+                        <div className="text-destructive p-4 text-center text-sm">{error}</div>
+                    ) : mapUrl && issData ? (
+                        <>
                             <Image 
                                 key={mapUrl}
                                 src={mapUrl} 
-                                alt={`Map of ISS location at ${issData?.latitude.toFixed(2)}, ${issData?.longitude.toFixed(2)}`}
+                                alt={`Map of ISS location at ${issData.latitude.toFixed(2)}, ${issData.longitude.toFixed(2)}`}
                                 fill 
                                 className="object-cover" 
                                 unoptimized
@@ -98,49 +87,47 @@ const ISSWidget = () => {
                             <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded-md text-xs">
                                 Lat: {issData.latitude.toFixed(2)}, Lon: {issData.longitude.toFixed(2)}
                             </div>
-                        </div>
+                        </>
+                    ) : (
+                        <div className="text-muted-foreground p-4 text-center text-sm">Could not load map data.</div>
+                    )}
+                </div>
 
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm mb-4">
-                            <div className="flex items-center gap-2">
-                                <ChevronsUp className="w-4 h-4 text-muted-foreground" />
-                                <span>Altitude: {issData.altitude.toFixed(2)} km</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Orbit className="w-4 h-4 text-muted-foreground" />
-                                <span>Velocity: {issData.velocity.toFixed(2)} km/h</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Eye className="w-4 h-4 text-muted-foreground" />
-                                <span className="capitalize">Visibility: {issData.visibility}</span>
-                            </div>
-                        </div>
-                        
-                        <Separator className="my-4" />
-
-                        <div className="space-y-3 flex-grow">
-                            <h4 className="text-sm font-medium flex items-center gap-2">
-                                <Users className="w-4 h-4" /> Current Crew ({crew.length})
-                            </h4>
-                            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-                                {crew.map(member => (
-                                    <div key={member.name} className="flex items-center gap-2">
-                                        <Avatar className="w-8 h-8">
-                                            <AvatarFallback>{member.avatar}</AvatarFallback>
-                                        </Avatar>
-                                        <div>
-                                            <p className="text-xs font-semibold">{member.name}</p>
-                                            <p className="text-xs text-muted-foreground">{member.role}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </>
-                ) : (
-                    <div className="flex items-center justify-center h-full text-muted-foreground p-4 text-center">
-                        Could not load map data.
+                <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm mb-4">
+                    <div className="flex items-center gap-2">
+                        <ChevronsUp className="w-4 h-4 text-muted-foreground" />
+                        <span>Altitude: {issData ? `${issData.altitude.toFixed(2)} km` : '...'}</span>
                     </div>
-                )}
+                    <div className="flex items-center gap-2">
+                        <Orbit className="w-4 h-4 text-muted-foreground" />
+                        <span>Velocity: {issData ? `${issData.velocity.toFixed(2)} km/h` : '...'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Eye className="w-4 h-4 text-muted-foreground" />
+                        <span className="capitalize">Visibility: {issData ? issData.visibility : '...'}</span>
+                    </div>
+                </div>
+                
+                <Separator className="my-4" />
+
+                <div className="space-y-3 flex-grow">
+                    <h4 className="text-sm font-medium flex items-center gap-2">
+                        <Users className="w-4 h-4" /> Current Crew ({crew.length})
+                    </h4>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                        {crew.map(member => (
+                            <div key={member.name} className="flex items-center gap-2">
+                                <Avatar className="w-8 h-8">
+                                    <AvatarFallback>{member.avatar}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                    <p className="text-xs font-semibold">{member.name}</p>
+                                    <p className="text-xs text-muted-foreground">{member.role}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </CardContent>
         </Card>
     );
