@@ -21,11 +21,11 @@ declare global {
 const Dashboard = () => {
   const vantaRef = useRef(null);
   const [vantaEffect, setVantaEffect] = useState<any>(null);
-  const [scriptsLoaded, setScriptsLoaded] = useState(false);
 
   useEffect(() => {
-    if (scriptsLoaded && window.VANTA && !vantaEffect) {
-      setVantaEffect(window.VANTA.DOTS({
+    let effect: any = null;
+    if (typeof window !== 'undefined' && window.THREE && window.VANTA) {
+      effect = window.VANTA.DOTS({
         el: vantaRef.current,
         mouseControls: true,
         touchControls: true,
@@ -40,27 +40,26 @@ const Dashboard = () => {
         showLines: false,
         size: 3.5,
         spacing: 30.00
-      }));
+      });
+      setVantaEffect(effect);
     }
-
+    
     return () => {
-      if (vantaEffect) {
-        vantaEffect.destroy();
+      if (effect) {
+        effect.destroy();
       }
     };
-  }, [scriptsLoaded, vantaEffect]);
+  }, []);
 
   return (
     <>
       <Script
         src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"
+        strategy="beforeInteractive"
+      />
+      <Script
+        src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.dots.min.js"
         strategy="afterInteractive"
-        onLoad={() => {
-          const vantaScript = document.createElement('script');
-          vantaScript.src = 'https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.dots.min.js';
-          vantaScript.onload = () => setScriptsLoaded(true);
-          document.body.appendChild(vantaScript);
-        }}
       />
       <div ref={vantaRef} className="fixed inset-0 -z-10" />
       <main className="flex-1 p-4 md:p-8">

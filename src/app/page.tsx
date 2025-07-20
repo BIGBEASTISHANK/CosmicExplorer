@@ -20,11 +20,11 @@ declare global {
 export default function Home() {
   const vantaRef = useRef(null);
   const [vantaEffect, setVantaEffect] = useState<any>(null);
-  const [scriptsLoaded, setScriptsLoaded] = useState(false);
 
   useEffect(() => {
-    if (scriptsLoaded && window.VANTA && !vantaEffect) {
-      setVantaEffect(window.VANTA.GLOBE({
+    let effect: any = null;
+    if (typeof window !== 'undefined' && window.THREE && window.VANTA) {
+      effect = window.VANTA.GLOBE({
         el: vantaRef.current,
         mouseControls: true,
         touchControls: true,
@@ -36,27 +36,26 @@ export default function Home() {
         backgroundColor: 0x0,
         color: 0x9833ea,
         size: 1.2,
-      }));
+      });
+      setVantaEffect(effect);
     }
 
     return () => {
-      if (vantaEffect) {
-        vantaEffect.destroy();
+      if (effect) {
+        effect.destroy();
       }
     };
-  }, [scriptsLoaded, vantaEffect]);
+  }, []);
 
   return (
     <>
       <Script 
         src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"
+        strategy="beforeInteractive"
+      />
+      <Script 
+        src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"
         strategy="afterInteractive"
-        onLoad={() => {
-          const vantaScript = document.createElement('script');
-          vantaScript.src = 'https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js';
-          vantaScript.onload = () => setScriptsLoaded(true);
-          document.body.appendChild(vantaScript);
-        }}
       />
       <div className="flex flex-col min-h-screen">
         <Header />
