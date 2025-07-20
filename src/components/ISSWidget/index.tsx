@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Satellite, Loader, Gauge, Orbit, ChevronsUp, Eye } from 'lucide-react';
+import { Users, Satellite, Loader, Orbit, ChevronsUp, Eye } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 
@@ -60,7 +60,7 @@ const ISSWidget = () => {
     }, []);
 
     const mapUrl = issData
-      ? `https://static-map.vercel.app/api/img?zoom=2&center=${issData.longitude},${issData.latitude}&markers=${issData.longitude},${issData.latitude},red&width=400&height=200&style=dark-matter`
+      ? `https://staticmap.openstreetmap.de/staticmap.php?center=${issData.latitude},${issData.longitude}&zoom=1&size=400x200&maptype=mapnik&markers=${issData.latitude},${issData.longitude},lightblue-pushpin`
       : null;
 
     return (

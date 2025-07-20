@@ -24,9 +24,9 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'static-map.vercel.app',
+        hostname: 'staticmap.openstreetmap.de',
         port: '',
-        pathname: '/api/img',
+        pathname: '/staticmap.php',
       }
     ],
   },
