@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { MapPin, Users, Satellite, Loader } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 type ISSData = {
     latitude: number;
@@ -17,6 +16,7 @@ const ISSWidget = () => {
     const [issData, setIssData] = useState<ISSData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [mapUrl, setMapUrl] = useState("https://placehold.co/400x200");
 
     const crew = [
         { name: 'Oleg Kononenko', role: 'Commander, Expedition 71', avatar: 'OK' },
@@ -31,12 +31,20 @@ const ISSWidget = () => {
     useEffect(() => {
         const fetchISSData = async () => {
             try {
+                // Set loading to true only for the initial fetch
+                if (!issData) setLoading(true);
+
                 const response = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
                 if (!response.ok) {
                     throw new Error('Failed to fetch ISS data');
                 }
                 const data: ISSData = await response.json();
                 setIssData(data);
+                
+                // Update the map URL with the new coordinates
+                const newMapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${data.longitude-10},${data.latitude-10},${data.longitude+10},${data.latitude+10}&layer=mapnik&marker=${data.latitude},${data.longitude}`;
+                setMapUrl(`https://static-map.vercel.app/api/img?zoom=2&center=${data.longitude},${data.latitude}&markers=${data.longitude},${data.latitude},red&width=400&height=200&style=dark-matter`);
+
                 setError(null);
             } catch (err) {
                 if (err instanceof Error) {
@@ -53,7 +61,7 @@ const ISSWidget = () => {
         const interval = setInterval(fetchISSData, 5000); // Refresh every 5 seconds
 
         return () => clearInterval(interval); // Cleanup on component unmount
-    }, []);
+    }, [issData]); // Re-run effect when issData is null initially
 
     return (
         <Card className="h-full flex flex-col">
@@ -66,10 +74,20 @@ const ISSWidget = () => {
             </CardHeader>
             <CardContent className="flex flex-col flex-grow">
                 <div className="relative aspect-video rounded-md overflow-hidden mb-4 bg-muted">
-                    <Image src="https://placehold.co/400x200" alt="Map of ISS location" fill className="object-cover" data-ai-hint="world map" />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                        <MapPin className="w-8 h-8 text-destructive animate-pulse" />
-                    </div>
+                    {loading ? (
+                         <div className="flex items-center justify-center h-full">
+                            <Loader className="w-8 h-8 animate-spin" />
+                         </div>
+                    ) : (
+                       <Image 
+                           key={mapUrl} // Use key to force re-render on URL change
+                           src={mapUrl} 
+                           alt="Map of ISS location" 
+                           fill 
+                           className="object-cover" 
+                           unoptimized // Necessary for external dynamic images
+                       />
+                    )}
                     <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded-md text-xs">
                         {loading && <div className="flex items-center gap-1"><Loader className="w-3 h-3 animate-spin" /> Loading...</div>}
                         {error && `Error: ${error}`}

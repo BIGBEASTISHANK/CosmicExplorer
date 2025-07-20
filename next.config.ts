@@ -21,6 +21,12 @@ const nextConfig: NextConfig = {
         hostname: 'apod.nasa.gov',
         port: '',
         pathname: '/apod/image/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'static-map.vercel.app',
+        port: '',
+        pathname: '/api/img',
       }
     ],
   },
