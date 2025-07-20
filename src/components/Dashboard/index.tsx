@@ -14,6 +14,7 @@ declare global {
     VANTA: {
       DOTS: (options: VantaDots) => any;
     };
+    THREE: any;
   }
 }
 
@@ -23,30 +24,23 @@ const Dashboard = () => {
   const [scriptsLoaded, setScriptsLoaded] = useState(false);
 
   useEffect(() => {
-    if (scriptsLoaded && !vantaEffect) {
-      const vantaScript = document.createElement('script');
-      vantaScript.src = 'https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.dots.min.js';
-      vantaScript.onload = () => {
-        if (window.VANTA && vantaRef.current) {
-          setVantaEffect(window.VANTA.DOTS({
-            el: vantaRef.current,
-            mouseControls: true,
-            touchControls: true,
-            gyroControls: false,
-            minHeight: 200.00,
-            minWidth: 200.00,
-            scale: 1.00,
-            scaleMobile: 1.00,
-            backgroundColor: 0x111111,
-            color: 0xBE52F2,
-            color2: 0x0B3D91,
-            showLines: false,
-            size: 3.5,
-            spacing: 30.00
-          }));
-        }
-      };
-      document.body.appendChild(vantaScript);
+    if (scriptsLoaded && window.VANTA && !vantaEffect) {
+      setVantaEffect(window.VANTA.DOTS({
+        el: vantaRef.current,
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.00,
+        minWidth: 200.00,
+        scale: 1.00,
+        scaleMobile: 1.00,
+        backgroundColor: 0x111111,
+        color: 0xBE52F2,
+        color2: 0x0B3D91,
+        showLines: false,
+        size: 3.5,
+        spacing: 30.00
+      }));
     }
 
     return () => {
@@ -61,34 +55,30 @@ const Dashboard = () => {
       <Script
         src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"
         strategy="afterInteractive"
-        onLoad={() => setScriptsLoaded(true)}
+        onLoad={() => {
+          const vantaScript = document.createElement('script');
+          vantaScript.src = 'https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.dots.min.js';
+          vantaScript.onload = () => setScriptsLoaded(true);
+          document.body.appendChild(vantaScript);
+        }}
       />
       <div ref={vantaRef} className="fixed inset-0 -z-10" />
       <main className="flex-1 p-4 md:p-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Earth Image - takes up 2/3 of width on large screens */}
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 lg:row-span-2">
             <EarthImage />
           </div>
-
-          {/* Mars Weather */}
           <div className="lg:col-span-1">
             <MarsWeather />
           </div>
-
-          {/* APOD */}
+          <div className="lg:col-span-1">
+            <ISSWidget />
+          </div>
           <div className="lg:col-span-1">
             <APOD />
           </div>
-
-          {/* Asteroid Tracker */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-2">
             <AsteroidTracker />
-          </div>
-
-          {/* ISS Tracker */}
-          <div className="lg:col-span-1">
-            <ISSWidget />
           </div>
         </div>
       </main>
