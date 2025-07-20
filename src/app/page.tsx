@@ -21,10 +21,12 @@ export default function Home() {
   const vantaRef = useRef(null);
   const [vantaEffect, setVantaEffect] = useState<any>(null);
 
-  useEffect(() => {
-    let effect: any = null;
-    if (typeof window !== 'undefined' && window.THREE && window.VANTA) {
-      effect = window.VANTA.GLOBE({
+  const initVanta = () => {
+    if (vantaEffect) {
+      vantaEffect.destroy();
+    }
+    if (window.VANTA && window.VANTA.GLOBE) {
+      const effect = window.VANTA.GLOBE({
         el: vantaRef.current,
         mouseControls: true,
         touchControls: true,
@@ -39,23 +41,34 @@ export default function Home() {
       });
       setVantaEffect(effect);
     }
+  };
 
+  useEffect(() => {
+    // This effect will run on component mount if VANTA is already available
+    // from a previous page navigation.
+    if (window.VANTA && window.VANTA.GLOBE) {
+      initVanta();
+    }
+
+    // The cleanup function will run when the component unmounts.
     return () => {
-      if (effect) {
-        effect.destroy();
+      if (vantaEffect) {
+        vantaEffect.destroy();
       }
     };
-  }, []);
+  }, []); // The empty dependency array ensures this runs only once on mount and cleanup on unmount.
 
   return (
     <>
+      {/* The `onLoad` callback ensures `initVanta` is called only after the script has loaded. */}
       <Script 
         src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"
-        strategy="beforeInteractive"
+        strategy="afterInteractive"
       />
       <Script 
         src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"
         strategy="afterInteractive"
+        onLoad={initVanta}
       />
       <div className="flex flex-col min-h-screen">
         <Header />

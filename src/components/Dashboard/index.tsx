@@ -22,10 +22,12 @@ const Dashboard = () => {
   const vantaRef = useRef(null);
   const [vantaEffect, setVantaEffect] = useState<any>(null);
 
-  useEffect(() => {
-    let effect: any = null;
-    if (typeof window !== 'undefined' && window.THREE && window.VANTA) {
-      effect = window.VANTA.DOTS({
+  const initVanta = () => {
+    if (vantaEffect) {
+      vantaEffect.destroy();
+    }
+    if (window.VANTA && window.VANTA.DOTS) {
+      const effect = window.VANTA.DOTS({
         el: vantaRef.current,
         mouseControls: true,
         touchControls: true,
@@ -43,23 +45,35 @@ const Dashboard = () => {
       });
       setVantaEffect(effect);
     }
+  };
+  
+  useEffect(() => {
+    // This effect will run on component mount if VANTA is already available
+    // from a previous page navigation.
+    if (window.VANTA && window.VANTA.DOTS) {
+      initVanta();
+    }
     
+    // The cleanup function will run when the component unmounts.
     return () => {
-      if (effect) {
-        effect.destroy();
+      if (vantaEffect) {
+        vantaEffect.destroy();
       }
     };
-  }, []);
+  }, []); // The empty dependency array ensures this runs only once on mount and cleanup on unmount.
+
 
   return (
     <>
+      {/* The `onLoad` callback ensures `initVanta` is called only after the script has loaded. */}
       <Script
         src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"
-        strategy="beforeInteractive"
+        strategy="afterInteractive"
       />
       <Script
         src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.dots.min.js"
         strategy="afterInteractive"
+        onLoad={initVanta}
       />
       <div ref={vantaRef} className="fixed inset-0 -z-10" />
       <main className="flex-1 p-4 md:p-8">
