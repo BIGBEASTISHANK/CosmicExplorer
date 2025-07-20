@@ -20,23 +20,31 @@ declare global {
 export default function Home() {
   const vantaRef = useRef(null);
   const [vantaEffect, setVantaEffect] = useState<any>(null);
-  const [scriptsLoaded, setScriptsLoaded] = useState(false);
+  const [threeLoaded, setThreeLoaded] = useState(false);
 
   useEffect(() => {
-    if (scriptsLoaded && !vantaEffect) {
-      setVantaEffect(window.VANTA.GLOBE({
-        el: vantaRef.current,
-        mouseControls: true,
-        touchControls: true,
-        gyroControls: false,
-        minHeight: 200.00,
-        minWidth: 200.00,
-        scale: 1.00,
-        scaleMobile: 1.00,
-        backgroundColor: 0x0,
-        color: 0x2169b6,
-        size: 1.2,
-      }));
+    if (threeLoaded && !vantaEffect) {
+      // Dynamically load vanta.js after three.js is loaded
+      const vantaScript = document.createElement('script');
+      vantaScript.src = 'https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js';
+      vantaScript.onload = () => {
+        if (window.VANTA && vantaRef.current) {
+          setVantaEffect(window.VANTA.GLOBE({
+            el: vantaRef.current,
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            backgroundColor: 0x0,
+            color: 0x2169b6,
+            size: 1.2,
+          }));
+        }
+      };
+      document.body.appendChild(vantaScript);
     }
 
     return () => {
@@ -44,15 +52,15 @@ export default function Home() {
         vantaEffect.destroy();
       }
     };
-  }, [scriptsLoaded, vantaEffect]);
+  }, [threeLoaded, vantaEffect]);
 
   return (
     <>
       <Script 
         src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"
-        onLoad={() => setScriptsLoaded(true)}
+        strategy="afterInteractive"
+        onLoad={() => setThreeLoaded(true)}
       />
-      <Script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js" />
       <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-1">
