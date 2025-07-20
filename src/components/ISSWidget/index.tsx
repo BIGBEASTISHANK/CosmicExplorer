@@ -16,7 +16,6 @@ const ISSWidget = () => {
     const [issData, setIssData] = useState<ISSData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [mapUrl, setMapUrl] = useState("https://placehold.co/400x200");
 
     const crew = [
         { name: 'Oleg Kononenko', role: 'Commander, Expedition 71', avatar: 'OK' },
@@ -31,21 +30,12 @@ const ISSWidget = () => {
     useEffect(() => {
         const fetchISSData = async () => {
             try {
-                // Keep loading state true only on initial fetch
-                if (!issData) {
-                    setLoading(true);
-                }
-
                 const response = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
                 if (!response.ok) {
                     throw new Error('Failed to fetch ISS data');
                 }
                 const data: ISSData = await response.json();
                 setIssData(data);
-                
-                // Update the map URL with the new coordinates
-                setMapUrl(`https://static-map.vercel.app/api/img?zoom=2&center=${data.longitude},${data.latitude}&markers=${data.longitude},${data.latitude},red&width=400&height=200&style=dark-matter`);
-
                 setError(null);
             } catch (err) {
                 if (err instanceof Error) {
@@ -54,7 +44,7 @@ const ISSWidget = () => {
                     setError('An unknown error occurred.');
                 }
             } finally {
-                // Ensure loading is false after the first fetch completes
+                // Set loading to false only after the first fetch attempt
                 if (loading) {
                     setLoading(false);
                 }
@@ -65,7 +55,12 @@ const ISSWidget = () => {
         const interval = setInterval(fetchISSData, 5000); // Refresh every 5 seconds
 
         return () => clearInterval(interval); // Cleanup on component unmount
-    }, []); // Empty dependency array ensures this runs once on mount and sets up the interval correctly.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Empty dependency array ensures this runs once on mount and sets up the interval.
+
+    const mapUrl = issData
+      ? `https://static-map.vercel.app/api/img?zoom=2&center=${issData.longitude},${issData.latitude}&markers=${issData.longitude},${issData.latitude},red&width=400&height=200&style=dark-matter`
+      : "https://placehold.co/400x200";
 
     return (
         <Card className="h-full flex flex-col">
@@ -77,20 +72,25 @@ const ISSWidget = () => {
                 <CardDescription>Real-time location & crew</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col flex-grow">
-                <div className="relative aspect-video rounded-md overflow-hidden mb-4 bg-muted">
+                <div className="relative aspect-video rounded-md overflow-hidden bg-muted">
                     {loading ? (
                          <div className="flex items-center justify-center h-full">
                             <Loader className="w-8 h-8 animate-spin" />
+                            <span className="sr-only">Loading map...</span>
                          </div>
-                    ) : (
+                    ) : issData ? (
                        <Image 
-                           key={mapUrl} // Use key to force re-render on URL change
+                           key={mapUrl}
                            src={mapUrl} 
-                           alt="Map of ISS location" 
+                           alt={`Map of ISS location at ${issData.latitude.toFixed(2)}, ${issData.longitude.toFixed(2)}`}
                            fill 
                            className="object-cover" 
-                           unoptimized // Necessary for external dynamic images
+                           unoptimized
                        />
+                    ) : (
+                        <div className="flex items-center justify-center h-full text-destructive-foreground">
+                            Could not load map.
+                        </div>
                     )}
                     <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded-md text-xs">
                         {issData && `Lat: ${issData.latitude.toFixed(2)}, Lon: ${issData.longitude.toFixed(2)}`}
