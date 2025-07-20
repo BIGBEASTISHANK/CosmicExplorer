@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Users, Satellite, Loader } from 'lucide-react';
+import { Users, Satellite, Loader } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 
@@ -31,8 +31,10 @@ const ISSWidget = () => {
     useEffect(() => {
         const fetchISSData = async () => {
             try {
-                // Set loading to true only for the initial fetch
-                if (!issData) setLoading(true);
+                // Keep loading state true only on initial fetch
+                if (!issData) {
+                    setLoading(true);
+                }
 
                 const response = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
                 if (!response.ok) {
@@ -42,7 +44,6 @@ const ISSWidget = () => {
                 setIssData(data);
                 
                 // Update the map URL with the new coordinates
-                const newMapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${data.longitude-10},${data.latitude-10},${data.longitude+10},${data.latitude+10}&layer=mapnik&marker=${data.latitude},${data.longitude}`;
                 setMapUrl(`https://static-map.vercel.app/api/img?zoom=2&center=${data.longitude},${data.latitude}&markers=${data.longitude},${data.latitude},red&width=400&height=200&style=dark-matter`);
 
                 setError(null);
@@ -53,7 +54,10 @@ const ISSWidget = () => {
                     setError('An unknown error occurred.');
                 }
             } finally {
-                setLoading(false);
+                // Ensure loading is false after the first fetch completes
+                if (loading) {
+                    setLoading(false);
+                }
             }
         };
 
@@ -61,7 +65,7 @@ const ISSWidget = () => {
         const interval = setInterval(fetchISSData, 5000); // Refresh every 5 seconds
 
         return () => clearInterval(interval); // Cleanup on component unmount
-    }, [issData]); // Re-run effect when issData is null initially
+    }, []); // Empty dependency array ensures this runs once on mount and sets up the interval correctly.
 
     return (
         <Card className="h-full flex flex-col">
@@ -89,9 +93,9 @@ const ISSWidget = () => {
                        />
                     )}
                     <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded-md text-xs">
-                        {loading && <div className="flex items-center gap-1"><Loader className="w-3 h-3 animate-spin" /> Loading...</div>}
+                        {issData && `Lat: ${issData.latitude.toFixed(2)}, Lon: ${issData.longitude.toFixed(2)}`}
+                        {loading && !issData && <div className="flex items-center gap-1"><Loader className="w-3 h-3 animate-spin" /> Loading...</div>}
                         {error && `Error: ${error}`}
-                        {issData && !loading && `Lat: ${issData.latitude.toFixed(2)}, Lon: ${issData.longitude.toFixed(2)}`}
                     </div>
                 </div>
                 <Separator className="my-4" />
