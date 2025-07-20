@@ -28,6 +28,8 @@ const ISSWidget = () => {
     ];
 
     useEffect(() => {
+        let isMounted = true;
+
         const fetchISSData = async () => {
             try {
                 const response = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
@@ -35,17 +37,20 @@ const ISSWidget = () => {
                     throw new Error('Failed to fetch ISS data');
                 }
                 const data: ISSData = await response.json();
-                setIssData(data);
-                setError(null);
-            } catch (err) {
-                if (err instanceof Error) {
-                    setError(err.message);
-                } else {
-                    setError('An unknown error occurred.');
+                if (isMounted) {
+                    setIssData(data);
+                    setError(null);
                 }
+            } catch (err) {
+                 if (isMounted) {
+                    if (err instanceof Error) {
+                        setError(err.message);
+                    } else {
+                        setError('An unknown error occurred.');
+                    }
+                 }
             } finally {
-                // Set loading to false only after the first fetch attempt
-                if (loading) {
+                if (isMounted) {
                     setLoading(false);
                 }
             }
@@ -54,9 +59,11 @@ const ISSWidget = () => {
         fetchISSData(); // Initial fetch
         const interval = setInterval(fetchISSData, 5000); // Refresh every 5 seconds
 
-        return () => clearInterval(interval); // Cleanup on component unmount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Empty dependency array ensures this runs once on mount and sets up the interval.
+        return () => {
+            isMounted = false;
+            clearInterval(interval); // Cleanup on component unmount
+        };
+    }, []);
 
     const mapUrl = issData
       ? `https://static-map.vercel.app/api/img?zoom=2&center=${issData.longitude},${issData.latitude}&markers=${issData.longitude},${issData.latitude},red&width=400&height=200&style=dark-matter`
@@ -89,13 +96,17 @@ const ISSWidget = () => {
                        />
                     ) : (
                         <div className="flex items-center justify-center h-full text-destructive-foreground">
-                            Could not load map.
+                            {error ? `Error: ${error}` : 'Could not load map.'}
                         </div>
                     )}
                     <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded-md text-xs">
-                        {issData && `Lat: ${issData.latitude.toFixed(2)}, Lon: ${issData.longitude.toFixed(2)}`}
-                        {loading && !issData && <div className="flex items-center gap-1"><Loader className="w-3 h-3 animate-spin" /> Loading...</div>}
-                        {error && `Error: ${error}`}
+                        {loading && !issData ? (
+                            <div className="flex items-center gap-1"><Loader className="w-3 h-3 animate-spin" /> Loading...</div>
+                        ) : issData ? (
+                           `Lat: ${issData.latitude.toFixed(2)}, Lon: ${issData.longitude.toFixed(2)}`
+                        ) : (
+                           `Error loading data`
+                        )}
                     </div>
                 </div>
                 <Separator className="my-4" />
