@@ -24,9 +24,9 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'maps.googleapis.com',
+        hostname: 'staticmap.openstreetmap.de',
         port: '',
-        pathname: '/maps/api/staticmap',
+        pathname: '/**',
       }
     ],
   },

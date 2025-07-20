@@ -33,7 +33,10 @@ const ISSWidget = () => {
     useEffect(() => {
         const fetchISSData = async () => {
             try {
-                setLoading(prev => !issData ? true : false); // only show big loader on first load
+                // Only show the main loader on initial fetch
+                if (!issData) {
+                    setLoading(true);
+                }
                 const response = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
                 if (!response.ok) {
                     throw new Error('Failed to fetch ISS data');
@@ -58,10 +61,8 @@ const ISSWidget = () => {
         return () => clearInterval(interval);
     }, [issData]);
 
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-    
-    const mapUrl = issData && apiKey
-      ? `https://maps.googleapis.com/maps/api/staticmap?center=${issData.latitude},${issData.longitude}&zoom=2&size=400x200&maptype=satellite&markers=color:red%7C${issData.latitude},${issData.longitude}&key=${apiKey}`
+    const mapUrl = issData
+      ? `https://staticmap.openstreetmap.de/staticmap.php?center=${issData.latitude},${issData.longitude}&zoom=2&size=400x200&maptype=mapnik`
       : null;
 
     return (
@@ -135,7 +136,7 @@ const ISSWidget = () => {
                     </>
                 ) : (
                     <div className="flex items-center justify-center h-full text-muted-foreground p-4 text-center">
-                        Could not load map data. Make sure the Google Maps API key is set.
+                        Could not load map data.
                     </div>
                 )}
             </CardContent>
