@@ -55,15 +55,15 @@ Designed and built for **Nebula Nexus** by Club Cosmos
 ## Getting Started
 
 ### 1. **Clone the Repository**
-      ```bash
-      git clone https://github.com/your-username/cosmic-explorer.git
-      cd cosmic-explorer
-      ```
+```bash
+git clone https://github.com/your-username/cosmic-explorer.git
+cd cosmic-explorer
+```
 
 ### 2. Install Dependencies
-       ```bash
-       npm install
-       ```
+```bash
+npm install
+```
 
 ### 3. Configure Environment
 
@@ -72,17 +72,12 @@ Designed and built for **Nebula Nexus** by Club Cosmos
 
 
 ### 4. Run Locally
-       ```bash
-       npm run dev
-       ```
+```bash
+npm run dev
+```
 - Visit `http://localhost:3000` in your browser.
 
-### 5. Build for Production
-       ```bash
-       npm run build
-       ```
-
-- Deploy to Firebase or any preferred hosting service.
+- Deploy to Vercel or any preferred hosting service.
 
 ---
 
@@ -110,14 +105,6 @@ Designed and built for **Nebula Nexus** by Club Cosmos
 | Asteroid Data     | [Asteroids NeoWs](https://api.nasa.gov/)          |
 | Satellite Imagery | [GIBS imagery](https://api.nasa.gov/)             |
 | MapTiler          | [MapTiler](https://www.maptiler.com/)             |
----
-
-## Contributing
-
-1. Fork the repository
-2. Make your changes in a new branch
-3. Submit a pull request
-
 ---
 
 ## 👥 Credits
