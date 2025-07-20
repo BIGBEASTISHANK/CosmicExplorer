@@ -1,6 +1,6 @@
 # 🌌 Cosmic Explorer
 
-![Banner](.)
+![Banner](./public/logo.png)
 
 **A Real-Time Space Mission Dashboard**  
 Designed and built for **Nebula Nexus** by Club Cosmos
