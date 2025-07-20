@@ -28,8 +28,6 @@ const ISSWidget = () => {
     ];
 
     useEffect(() => {
-        let isMounted = true;
-
         const fetchISSData = async () => {
             try {
                 const response = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
@@ -37,22 +35,16 @@ const ISSWidget = () => {
                     throw new Error('Failed to fetch ISS data');
                 }
                 const data: ISSData = await response.json();
-                if (isMounted) {
-                    setIssData(data);
-                    setError(null);
-                }
+                setIssData(data);
+                setError(null);
             } catch (err) {
-                 if (isMounted) {
-                    if (err instanceof Error) {
-                        setError(err.message);
-                    } else {
-                        setError('An unknown error occurred.');
-                    }
-                 }
-            } finally {
-                if (isMounted) {
-                    setLoading(false);
+                if (err instanceof Error) {
+                    setError(err.message);
+                } else {
+                    setError('An unknown error occurred.');
                 }
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -60,14 +52,13 @@ const ISSWidget = () => {
         const interval = setInterval(fetchISSData, 5000); // Refresh every 5 seconds
 
         return () => {
-            isMounted = false;
             clearInterval(interval); // Cleanup on component unmount
         };
     }, []);
 
     const mapUrl = issData
       ? `https://static-map.vercel.app/api/img?zoom=2&center=${issData.longitude},${issData.latitude}&markers=${issData.longitude},${issData.latitude},red&width=400&height=200&style=dark-matter`
-      : "https://placehold.co/400x200";
+      : null;
 
     return (
         <Card className="h-full flex flex-col">
@@ -85,27 +76,25 @@ const ISSWidget = () => {
                             <Loader className="w-8 h-8 animate-spin" />
                             <span className="sr-only">Loading map...</span>
                          </div>
-                    ) : issData ? (
+                    ) : mapUrl ? (
                        <Image 
                            key={mapUrl}
                            src={mapUrl} 
-                           alt={`Map of ISS location at ${issData.latitude.toFixed(2)}, ${issData.longitude.toFixed(2)}`}
+                           alt={`Map of ISS location at ${issData?.latitude.toFixed(2)}, ${issData?.longitude.toFixed(2)}`}
                            fill 
                            className="object-cover" 
                            unoptimized
                        />
                     ) : (
-                        <div className="flex items-center justify-center h-full text-destructive-foreground">
-                            {error ? `Error: ${error}` : 'Could not load map.'}
+                        <div className="flex items-center justify-center h-full text-destructive-foreground p-4 text-center">
+                            {error ? `Error: ${error}` : 'Could not load map data.'}
                         </div>
                     )}
                     <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded-md text-xs">
-                        {loading && !issData ? (
-                            <div className="flex items-center gap-1"><Loader className="w-3 h-3 animate-spin" /> Loading...</div>
-                        ) : issData ? (
+                        {issData ? (
                            `Lat: ${issData.latitude.toFixed(2)}, Lon: ${issData.longitude.toFixed(2)}`
                         ) : (
-                           `Error loading data`
+                           <div className="flex items-center gap-1"><Loader className="w-3 h-3 animate-spin" /> Loading...</div>
                         )}
                     </div>
                 </div>
