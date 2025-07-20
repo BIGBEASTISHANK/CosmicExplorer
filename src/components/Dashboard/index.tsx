@@ -48,24 +48,20 @@ const Dashboard = () => {
   };
   
   useEffect(() => {
-    // This effect will run on component mount if VANTA is already available
-    // from a previous page navigation.
-    if (window.VANTA && window.VANTA.DOTS) {
+    if (window.VANTA?.DOTS) {
       initVanta();
     }
     
-    // The cleanup function will run when the component unmounts.
     return () => {
       if (vantaEffect) {
         vantaEffect.destroy();
       }
     };
-  }, []); // The empty dependency array ensures this runs only once on mount and cleanup on unmount.
+  }, []); 
 
 
   return (
     <>
-      {/* The `onLoad` callback ensures `initVanta` is called only after the script has loaded. */}
       <Script
         src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"
         strategy="afterInteractive"
