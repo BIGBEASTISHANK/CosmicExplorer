@@ -39,7 +39,7 @@ export default function Home() {
             scale: 1.00,
             scaleMobile: 1.00,
             backgroundColor: 0x0,
-            color: 0x2169b6,
+            color: 0x9833ea,
             size: 1.2,
           }));
         }
@@ -72,7 +72,7 @@ export default function Home() {
               <p className="max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground mb-8">
                 Your portal to the universe. Explore real-time data from NASA, from the surface of Mars to the vastness of near-Earth space.
               </p>
-              <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+              <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
                 <Link href="/dashboard">
                   Launch Dashboard <ArrowRight className="ml-2" />
                 </Link>
