@@ -6,21 +6,18 @@ import MarsWeather from '@/components/MarsWeather';
 
 const Dashboard = () => {
   return (
-    <div className="grid gap-8 grid-cols-1 md:grid-cols-12">
-      <div className="col-span-12">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      {/* Left Column */}
+      <div className="lg:col-span-8 flex flex-col gap-8">
         <APOD />
-      </div>
-      <div className="md:col-span-6 lg:col-span-8">
-        <EarthImage />
-      </div>
-      <div className="md:col-span-6 lg:col-span-4">
-        <MarsWeather />
-      </div>
-      <div className="col-span-12">
         <AsteroidTracker />
-      </div>
-      <div className="col-span-12">
         <ISSWidget />
+      </div>
+      
+      {/* Right Column */}
+      <div className="lg:col-span-4 flex flex-col gap-8">
+        <MarsWeather />
+        <EarthImage />
       </div>
     </div>
   );
