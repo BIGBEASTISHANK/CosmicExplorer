@@ -12,7 +12,7 @@ const APOD = () => {
       <CardContent className="flex-grow">
         <div className="relative aspect-video rounded-md overflow-hidden mb-4">
           <Image
-            src="https://placehold.co/600x400"
+            src="/veil-nebula-nasa.png"
             alt="The Veil Nebula"
             fill
             className="object-cover"
