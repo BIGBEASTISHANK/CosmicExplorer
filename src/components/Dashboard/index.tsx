@@ -1,14 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import Script from "next/script";
-import type { VantaDots } from "@/types/vanta";
-import APOD from "@/components/APOD";
-import AsteroidTracker from "@/components/AsteroidTracker";
-import EarthImage from "@/components/EarthImage";
-import ISSWidget from "@/components/ISSWidget";
-import MarsWeather from "@/components/MarsWeather";
-import SatelliteTelemetry from "@/components/SatelliteTelemetry";
+import { useState, useEffect, useRef } from 'react';
+import Script from 'next/script';
+import type { VantaDots } from '@/types/vanta';
+import APOD from '@/components/APOD';
+import AsteroidTracker from '@/components/AsteroidTracker';
+import EarthImage from '@/components/EarthImage';
+import ISSWidget from '@/components/ISSWidget';
+import MarsWeather from '@/components/MarsWeather';
 
 declare global {
   interface Window {
@@ -33,32 +32,33 @@ const Dashboard = () => {
         mouseControls: true,
         touchControls: true,
         gyroControls: false,
-        minHeight: 200.0,
-        minWidth: 200.0,
-        scale: 1.0,
-        scaleMobile: 1.0,
+        minHeight: 200.00,
+        minWidth: 200.00,
+        scale: 1.00,
+        scaleMobile: 1.00,
         backgroundColor: 0x111111,
-        color: 0xbe52f2,
-        color2: 0x0b3d91,
+        color: 0xBE52F2,
+        color2: 0x0B3D91,
         showLines: false,
         size: 3.5,
-        spacing: 30.0,
+        spacing: 30.00
       });
       setVantaEffect(effect);
     }
   };
-
+  
   useEffect(() => {
     if (window.VANTA?.DOTS) {
       initVanta();
     }
-
+    
     return () => {
       if (vantaEffect) {
         vantaEffect.destroy();
       }
     };
-  }, []);
+  }, []); 
+
 
   return (
     <>
@@ -84,13 +84,10 @@ const Dashboard = () => {
             <ISSWidget />
           </div>
           <div className="lg:col-span-1">
-            <AsteroidTracker />
-          </div>
-          <div className="lg:col-span-1">
             <APOD />
           </div>
-          <div className="lg:col-span-1">
-            <SatelliteTelemetry />
+          <div className="lg:col-span-2">
+            <AsteroidTracker />
           </div>
         </div>
       </main>
