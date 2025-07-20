@@ -3,7 +3,6 @@ import AsteroidTracker from '@/components/AsteroidTracker';
 import EarthImage from '@/components/EarthImage';
 import ISSWidget from '@/components/ISSWidget';
 import MarsWeather from '@/components/MarsWeather';
-import SpaceWeather from '@/components/SpaceWeather';
 
 const Dashboard = () => {
   return (
@@ -13,9 +12,6 @@ const Dashboard = () => {
       </div>
       <div className="lg:col-span-1 xl:col-span-2">
         <EarthImage />
-      </div>
-      <div className="lg:col-span-3 xl:col-span-4">
-        <SpaceWeather />
       </div>
       <div className="lg:col-span-1 xl:col-span-1">
         <MarsWeather />
